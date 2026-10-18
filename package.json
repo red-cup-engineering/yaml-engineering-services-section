@@ -1,6 +1,11 @@
 {
   "name": "@red-cup-engineering/yaml-services-section",
   "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/red-cup-engineering/computer-serialized-content-engineering-services-section.git",
+    "directory": "services/yaml-services-section"
+  },
   "type": "module",
   "description": "Proof-path section for YAML flatfile serialization."
 }
