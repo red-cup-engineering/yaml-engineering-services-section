@@ -9,5 +9,10 @@
   "description": "Proof-path section for YAML flatfile serialization.",
   "files": [
     "data"
-  ]
+  ],
+  "license": "MIT",
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/561-group/.github/blob/main/TIPS.md"
+  }
 }
