@@ -2,3 +2,7 @@
 	path = services/yaml-frontmatter-codec-service
 	url = https://github.com/red-cup-engineering/yaml-frontmatter-codec-service.git
 	branch = main
+[submodule "services/csl-yaml-services-section"]
+	path = services/csl-yaml-services-section
+	url = https://github.com/red-cup-engineering/csl-yaml-services-section.git
+	branch = main
