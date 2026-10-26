@@ -1,4 +1,0 @@
-[submodule "yaml-frontmatter-codec-service"]
-	path = services/yaml-frontmatter-codec-service
-	url = https://github.com/red-cup-engineering/yaml-frontmatter-codec-service.git
-	branch = main
