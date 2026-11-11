@@ -1,4 +1,4 @@
-# @red-cup-engineering/yaml-engineering-services-section
+# YAML engineering
 
 <!-- 561-group-standards:badges:start -->
 [![Red Cup Engineering](https://img.shields.io/badge/561%20Group-Red%20Cup%20Engineering-c0392b)](https://github.com/red-cup-engineering)
@@ -7,6 +7,6 @@
 [![Tips welcome](https://img.shields.io/badge/tips-welcome-d4a017)](https://github.com/561-group/.github/blob/main/TIPS.md)
 <!-- 561-group-standards:badges:end -->
 
-Proof-path section for YAML flatfile serialization.
-
-Proof-path section for YAML flatfile serialization.
+This section groups the [YAML frontmatter codec](services/yaml-frontmatter-codec-service/) and
+[CSL YAML](services/csl-yaml-services-section/) packages. Their manifests
+and suites define the YAML operations and checks.
