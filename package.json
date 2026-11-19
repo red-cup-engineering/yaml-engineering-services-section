@@ -1,0 +1,16 @@
+{
+  "name": "@red-cup-engineering/yaml-engineering-services-section",
+  "private": true,
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/red-cup-engineering/yaml-engineering-services-section.git"
+  },
+  "type": "module",
+  "description": "Proof-path section for YAML flatfile serialization.",
+  "license": "MIT",
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/561-group/.github/blob/main/TIPS.md"
+  }
+}
