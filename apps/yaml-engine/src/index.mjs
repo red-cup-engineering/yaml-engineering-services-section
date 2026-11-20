@@ -305,8 +305,8 @@ function renderChangedArray(text, previous, values, keyIndent, flowOverride) {
     const useFlow = flowOverride !== undefined ? flowOverride : (isSeq(previous) ? previous.flow : false);
     const previousItems = isSeq(previous) ? previous.items : [];
     const rawFor = (value) => {
-        const kept = previousItems.find((old) => isScalar(old) && isDeepStrictEqual(old.value, value));
-        const raw = kept ? text.slice(kept.range[0], kept.range[1]) : null;
+        const retained = previousItems.find((old) => isScalar(old) && isDeepStrictEqual(old.value, value));
+        const raw = retained ? text.slice(retained.range[0], retained.range[1]) : null;
         return raw !== null && (!useFlow || isFlowScalarSource(raw, value)) ? raw : encodeFlowScalarOrNested(value);
     };
     if (useFlow)
@@ -649,8 +649,8 @@ export function repairYamlPlainScalars(source) {
         const offset = error.pos[0];
         const lineNumber = linePosition(text, offset).line;
         const line = sourceLines(text)[lineNumber - 1];
-        const rejected = { ok: false, reason: error.message, line: lineNumber };
-        if (!line || !REPAIRABLE_ERROR_CODES.has(error.code)) return rejected;
+        const refused = { ok: false, reason: error.message, line: lineNumber };
+        if (!line || !REPAIRABLE_ERROR_CODES.has(error.code)) return refused;
         // Native AST ranges identify value starts even when composition reports
         // an error. They avoid maintaining a second YAML grammar for repair.
         const candidates = [];
@@ -661,14 +661,14 @@ export function repairYamlPlainScalars(source) {
             const prefix = text.slice(line.start, start);
             return /(?:^\s*-\s+|:\s+)$/.test(prefix);
         });
-        if (!eligible.length) return rejected;
+        if (!eligible.length) return refused;
         const linkStart = eligible.find(start => /^\[[^\r\n]*\]\([^\r\n]*\)$/.test(text.slice(start, findCommentStart(text, start, line.contentEnd)).trimEnd()));
-        if (error.code === "UNEXPECTED_TOKEN" && linkStart === undefined) return rejected;
+        if (error.code === "UNEXPECTED_TOKEN" && linkStart === undefined) return refused;
         const start = error.code === "UNEXPECTED_TOKEN" ? linkStart : eligible.includes(offset) ? offset : Math.min(...eligible);
         const comment = findCommentStart(text, start, line.contentEnd);
         const value = text.slice(start, comment).trimEnd();
-        if (!value || /^["']/.test(value) || !needsQuote(value)) return rejected;
-        if (/^[\[{]/.test(value) && !(error.code === "UNEXPECTED_TOKEN" && /^\[[^\r\n]*\]\([^\r\n]*\)$/.test(value))) return rejected;
+        if (!value || /^["']/.test(value) || !needsQuote(value)) return refused;
+        if (/^[\[{]/.test(value) && !(error.code === "UNEXPECTED_TOKEN" && /^\[[^\r\n]*\]\([^\r\n]*\)$/.test(value))) return refused;
         const replacement = quoteYamlScalar(value);
         const next = text.slice(0, start) + replacement + text.slice(start + value.length);
         changes.push({ line: lineNumber, before: line.content, after: text.slice(line.start, start) + replacement + text.slice(start + value.length, line.contentEnd) });
