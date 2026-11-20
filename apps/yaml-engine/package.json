@@ -12,16 +12,18 @@
   },
   "files": [
     "src",
+    "test",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
-    "check": "node --check src/index.mjs && node --check src/document.mjs && node --check src/convert-yaml.mjs"
+    "check": "node --check src/index.mjs && node --check src/document.mjs && node --check src/convert-yaml.mjs && node --check src/source-codec.mjs && node --check src/syntax.mjs",
+    "test": "node --test test/*.test.mjs"
   },
   "dependencies": {
-    "@red-cup-engineering/json-engine": "^0.5.0",
-    "@red-cup-engineering/signcell": "^0.17.5",
-    "@red-cup-engineering/typed-content": "0.1.0-dev.0",
+    "@red-cup-engineering/json-engine": "^0.5.5 || 0.5.5-dev.0",
+    "@red-cup-engineering/signcell": "^0.18.1 || 0.18.1-dev.0",
+    "@red-cup-engineering/typed-content": "^0.1.1 || 0.1.1-dev.0",
     "yaml": "2.9.0"
   },
   "license": "MIT",
@@ -39,6 +41,6 @@
     "directory": "apps/yaml-engine"
   },
   "devDependencies": {
-    "@red-cup-engineering/semiotic-content-address-system": "0.1.7-dev.1"
+    "@red-cup-engineering/semiotic-content-address-system": "^0.1.8 || 0.1.8-dev.0"
   }
 }
