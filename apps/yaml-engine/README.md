@@ -1,6 +1,6 @@
 # YAML conversion and source edits
 
-YAML parsing uses checked-in [eemeli/yaml](src/upstream/yaml/UPSTREAM.md) source.
+YAML parsing uses the versioned [eemeli/yaml](https://github.com/eemeli/yaml) package.
 
 <!-- 561-group-standards:badges:start -->
 [![Red Cup Engineering](https://img.shields.io/badge/561%20Group-Red%20Cup%20Engineering-c0392b)](https://github.com/red-cup-engineering)
@@ -9,7 +9,7 @@ YAML parsing uses checked-in [eemeli/yaml](src/upstream/yaml/UPSTREAM.md) source
 [![Tips welcome](https://img.shields.io/badge/tips-welcome-d4a017)](https://github.com/561-group/.github/blob/main/TIPS.md)
 <!-- 561-group-standards:badges:end -->
 
-The native yaml 2.9.1 parser owns grammar, document directives, anchors, tags,
+The native YAML parser owns grammar, document directives, anchors, tags,
 source ranges and diagnostics. The hand-written restricted parser is removed.
 Markdown consumers still own frontmatter fences and body bytes.
 
@@ -33,8 +33,12 @@ No upstream compute, model or filesystem access is needed.
 
 ## Native prerequisite receiving
 
-Original behavior and public consumer tests are shipped and declared as receiving tests.
-The native dependency lock uses genuine archive identities, not workspace links.
-This development cohort is a prerequisite preview: local authentic-archive
-qualification is not registry issuance or live activation, and does not clear
-held supplier integration or issuance gates.
+Run `npm test` to exercise the same public YAML exports in source and in a
+received package. The two test files are distributed so the receiving workflow
+can rerun the codec, source-range and byte-witness contracts.
+
+The current development cohort uses modern SignCell values, JSON Engine
+conversion, Typed Content source codecs, and Semiotic Content Address for
+independent verification of source bytes. A local owner-source qualification is
+not registry issuance; a frozen consumer still needs the complete selected
+supplier graph and archive identities.
