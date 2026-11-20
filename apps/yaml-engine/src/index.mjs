@@ -1,5 +1,6 @@
+import { isRecord } from "@red-cup-engineering/signcell/values";
 /** YAML mapping projection and source-preserving edits. Markdown owns its fences. */
-import { isObjectRecord, requireJsonValue } from "@red-cup-engineering/json-engine";
+import { requireJsonValue } from "@red-cup-engineering/json-engine";
 import { isMap, isScalar, isSeq, visit } from "yaml";
 import { parseYamlDocument, jsonFromYamlDocument, requireYamlSyntax } from "./document.mjs";
 import { isDeepStrictEqual } from "node:util";
@@ -25,7 +26,7 @@ export function decodeYamlDocument(text, lineCounter) {
     const document = parseYamlDocument(text, { lineCounter });
     requireYamlSyntax(document);
     const value = document.contents === null ? {} : jsonFromYamlDocument(document);
-    if (!isObjectRecord(value)) throw new TypeError("yaml: document must be a mapping");
+    if (!isRecord(value)) throw new TypeError("yaml: document must be a mapping");
     return Object.freeze({ document, record: requireJsonValue(value, "yaml document") });
 }
 /** 1-indexed {line, column} of `offset` within `text`. */
@@ -333,7 +334,7 @@ function encodeFlowScalarOrNested(value) {
             return "[]";
         return `[ ${value.map(encodeFlowScalarOrNested).join(", ")} ]`;
     }
-    if (isObjectRecord(value))
+    if (isRecord(value))
         return encodeFlowMapping(value);
     const scalar = encodeScalar(value);
     return typeof value === "string" && !isFlowScalarSource(scalar, value) ? quoteString(value) : scalar;
@@ -531,7 +532,7 @@ export function encodeYaml(record) {
 export function encodeEntry(lines, rawKey, value, indent, where) {
     const key = KEY_PATTERN.test(rawKey) ? rawKey : quoteString(rawKey);
     const pad = " ".repeat(indent);
-    if (isObjectRecord(value)) {
+    if (isRecord(value)) {
         lines.push(`${pad}${key}:`);
         for (const [childKey, child] of Object.entries(value)) {
             if (child === undefined)
@@ -559,7 +560,7 @@ export function encodeSequence(lines, value, indent, where) {
     const pad = " ".repeat(indent);
     for (const [index, item] of value.entries()) {
         const itemWhere = `${where}[${index}]`;
-        if (isObjectRecord(item)) {
+        if (isRecord(item)) {
             encodeSequenceMapItem(lines, item, indent, itemWhere);
             continue;
         }
@@ -588,7 +589,7 @@ function encodeSequenceMapItem(lines, item, indent, where) {
 }
 function encodeInlineArray(value, where) {
     const items = value.map((item, index) => {
-        if (isObjectRecord(item))
+        if (isRecord(item))
             throw new TypeError(`${where}[${index}]: records inside nested arrays are not encodable`);
         if (Array.isArray(item))
             return encodeInlineArray(item, `${where}[${index}]`);
