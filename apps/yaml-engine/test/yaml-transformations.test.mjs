@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { yamlToJson, jsonToYaml, validateYamlDocument } from "@red-cup-engineering/yaml-engine/convert-yaml";
-import { decodeYaml, deleteYamlNestedKey, mutateYamlTopLevelMapping, projectFlatScalarStringLists, decodeYamlWithSourceLocations } from "@red-cup-engineering/yaml-engine";
+import { decodeYaml, encodeYaml, quoteYamlScalar, deleteYamlNestedKey, mutateYamlTopLevelMapping, projectFlatScalarStringLists, decodeYamlWithSourceLocations } from "@red-cup-engineering/yaml-engine";
 
 test("native aliases, JSON roots and types survive conversion without synthetic evidence", () => {
   assert.deepEqual(yamlToJson({text: "a: &defaults {active: true}\nb: *defaults\n"}).value, {a:{active:true},b:{active:true}});
@@ -89,4 +89,30 @@ test("frontmatter codec witnesses the original bytes and preserves distinct mapp
   assert.equal(verifyContentAddress(bytes, reading.source), true);
   assert.deepEqual(yamlFrontmatterSourceCodec.write(reading.value).reading.value, reading.value);
   assert.throws(() => yamlFrontmatterSourceCodec.read(Buffer.from("a: 1\na: 2\n")), /unique/i);
+});
+
+test("canonical mapping scalars preserve decoded multiline text without changing safe block bytes", () => {
+  for (const [raw, marker] of [["first\nsecond", "|-"], ["first\nsecond\n", "|"]]) {
+    const data = { observations: [{ key: "example", raw }] };
+    const text = `observations:\n  - key: example\n    raw: ${marker}\n      first\n      second\n`;
+    assert.equal(encodeYaml(data), text);
+    assert.deepEqual(decodeYaml(text), data);
+  }
+  for (const raw of [
+    "  first\nsecond  ",
+    "  first\n  second",
+    "  \nsecond",
+    "first\nsecond\n\n",
+    "first\r\nsecond",
+    "first\u0000\nsecond",
+    "first\u0080\nsecond",
+    "first\u0080second",
+  ]) {
+    const data = { observations: [{ key: "example", raw }, { key: "example", raw }] };
+    const encoded = encodeYaml(data);
+    assert.ok(encoded.includes("raw: " + quoteYamlScalar(raw)));
+    assert.doesNotMatch(encoded, /[\u0000\u0080]/u);
+    assert.deepEqual(decodeYaml(encoded), data);
+  }
+  assert.throws(() => encodeYaml({ list: ["first\nsecond"] }), /multi-line strings are not encodable as sequence items/u);
 });

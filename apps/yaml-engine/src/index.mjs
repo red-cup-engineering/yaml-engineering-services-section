@@ -5,6 +5,8 @@ import { isMap, isScalar, isSeq, visit } from "yaml";
 import { parseYamlDocument, jsonFromYamlDocument, requireYamlSyntax } from "./document.mjs";
 import { isDeepStrictEqual } from "node:util";
 const KEY_PATTERN = /^[A-Za-z0-9_][A-Za-z0-9_.-]*$/u;
+// YAML 1.2 printable characters (CR is excluded for literal preservation).
+const NONLITERAL_CHARACTER = /[\u0000-\u0008\u000b-\u001f\u007f-\u0084\u0086-\u009f\ud800-\udfff\ufffe\uffff]/u;
 /**
  * Whether a plain (unquoted) YAML scalar would misparse and therefore must be
  * quoted. Exported so a frontmatter repair tool can quote only the values
@@ -600,13 +602,23 @@ function encodeInlineArray(value, where) {
     return `[${items.join(", ")}]`;
 }
 function encodeBlockScalar(lines, keyLine, value, indent) {
-    const pad = " ".repeat(indent);
     const chomp = value.endsWith("\n") ? "" : "-";
     const body = value.endsWith("\n") ? value.slice(0, -1) : value;
-    lines.push(`${keyLine} |${chomp}`);
-    for (const line of body.split("\n")) {
-        lines.push(line === "" ? "" : `${pad}${line}`);
+    const contentLines = body.split("\n");
+    const atIndent = (pad) => contentLines.map((line) => line === "" ? "" : pad + line);
+    const header = `|${chomp}`;
+    // A canonical literal block is kept only if the same native parser
+    // sees the exact scalar. Its relative two-space indentation is the
+    // same inside an enclosing mapping or sequence of mappings.
+    const probe = NONLITERAL_CHARACTER.test(value) ? null
+        : parseYamlDocument([`value: ${header}`, ...atIndent("  "), ""].join("\n"));
+    const pair = isMap(probe?.contents) && probe.contents.items.length === 1 ? probe.contents.items[0] : null;
+    if (!probe || probe.errors.length || probe.warnings.length || !isScalar(pair?.value) || pair.value.value !== value) {
+        lines.push(`${keyLine} ${quoteYamlScalar(value)}`);
+        return;
     }
+    lines.push(`${keyLine} ${header}`);
+    for (const line of atIndent(" ".repeat(indent))) lines.push(line);
 }
 function encodeScalar(value) {
     if (value === null)
@@ -623,11 +635,14 @@ function encodeScalar(value) {
     return needsQuote(value) ? quoteString(value) : value;
 }
 export function needsQuote(text) {
-    if (typeof text !== "string" || text === "" || text !== text.trim()) return true;
+    if (typeof text !== "string" || text === "" || text !== text.trim() || NONLITERAL_CHARACTER.test(text)) return true;
     const document = parseYamlDocument(text);
     return document.errors.length !== 0 || document.warnings.length !== 0 || !isScalar(document.contents) || document.contents.type !== "PLAIN" || document.contents.value !== text;
 }
-function quoteString(text) { return JSON.stringify(text); }
+function quoteString(text) {
+    return JSON.stringify(text).replace(/[\u007f-\u0084\u0086-\u009f\ufffe\uffff]/gu,
+        (character) => "\\u" + character.charCodeAt(0).toString(16).padStart(4, "0"));
+}
 const REPAIRABLE_ERROR_CODES = new Set(["BLOCK_AS_IMPLICIT_KEY", "BAD_SCALAR_START", "UNEXPECTED_TOKEN"]);
 /** First inline comment following a prospective plain scalar. */
 function findCommentStart(text, from, to) {

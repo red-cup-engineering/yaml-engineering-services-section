@@ -17,6 +17,10 @@ The mapping API admits a finite JSON record: scalar keys become strings,
 safe integer values remain numbers, aliases resolve, and cycles, unresolved
 tags, nonfinite values and unsafe integers are refused. Existing canonical
 record serialization and source-preserving field edits remain available.
+A multiline mapping value retains its canonical literal block only when that
+form decodes to the exact original string. Otherwise the writer uses a quoted
+scalar, preserving leading indentation, additional trailing line feeds or
+carriage returns without changing the value.
 Edits to a valid document cannot leave an unresolved alias. Malformed source
 retains the conservative lexical edit and explicit scalar-repair paths.
 
