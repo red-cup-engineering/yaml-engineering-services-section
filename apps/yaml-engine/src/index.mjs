@@ -1,7 +1,7 @@
 import { isRecord } from "@red-cup-engineering/signcell/values";
 /** YAML mapping projection and source-preserving edits. Markdown owns its fences. */
 import { requireJsonValue } from "@red-cup-engineering/json-engine";
-import { isMap, isScalar, isSeq, visit } from "yaml";
+import { isMap, isScalar, isSeq, visit } from "./syntax.mjs";
 import { parseYamlDocument, jsonFromYamlDocument, requireYamlSyntax } from "./document.mjs";
 import { isDeepStrictEqual } from "node:util";
 const KEY_PATTERN = /^[A-Za-z0-9_][A-Za-z0-9_.-]*$/u;
@@ -314,7 +314,8 @@ function renderChangedArray(text, previous, values, keyIndent, flowOverride) {
     };
     if (useFlow)
         return `[ ${values.map(rawFor).join(", ")} ]`;
-    const pad = " ".repeat(keyIndent + 2);
+    // Continue at the column the existing block sequence already uses (it may sit level with its key).
+    const pad = " ".repeat(isSeq(previous) && !previous.flow ? columnAt(text, previous.range[0]) : keyIndent + 2);
     return values.map((value) => `- ${rawFor(value)}`).join(`\n${pad}`);
 }
 /** Default rendering for a brand-new key, or a value whose previous style cannot be reused. */

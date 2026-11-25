@@ -1,5 +1,5 @@
 /** Native YAML documents and an explicit, loss-refusing JSON projection. */
-import { parseDocument } from "yaml";
+import { parseDocument } from "./syntax.mjs";
 
 export function parseYamlDocument(text, options = {}) {
   if (typeof text !== "string") throw new TypeError("yaml: document must be a string");

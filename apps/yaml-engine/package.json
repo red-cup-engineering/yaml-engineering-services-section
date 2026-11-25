@@ -3,7 +3,7 @@
   "version": "0.1.1-dev.1",
   "private": false,
   "type": "module",
-  "description": "Full YAML mapping codec and byte-preserving top-level mapping mutation.",
+  "description": "Full YAML mapping codec, byte-preserving top-level mapping mutation, and the Group's own YAML 1.2 syntax.",
   "exports": {
     ".": "./src/index.mjs",
     "./convert-yaml": "./src/convert-yaml.mjs",
@@ -23,8 +23,7 @@
   "dependencies": {
     "@red-cup-engineering/json-engine": "^0.5.5 || 0.5.5-dev.0",
     "@red-cup-engineering/signcell": "^0.18.1 || 0.18.1-dev.0",
-    "@red-cup-engineering/typed-content": "^0.1.1 || 0.1.1-dev.0",
-    "yaml": "2.9.0"
+    "@red-cup-engineering/typed-content": "^0.1.1 || 0.1.1-dev.0"
   },
   "license": "MIT",
   "funding": {
